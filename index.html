@@ -358,6 +358,7 @@
     <div class="card intro" id="intro">
       <p>This 12-question quiz helps you explore your predominant adult attachment pattern using the two dimensions of anxiety and avoidance discussed in <em>Polysecure</em>.</p>
       <p>Answer based on how you <strong>generally</strong> feel and behave in close relationships. There are no right or wrong answers.</p>
+      <p style="font-size:0.82rem;">Your answers, result, and approximate location (city/region, based on your internet connection) are recorded and shared with the quiz creator.</p>
       <button class="btn-primary" onclick="startQuiz()">Begin Quiz</button>
     </div>
 
@@ -533,6 +534,41 @@
       }
     };
 
+    // Paste your Google Apps Script web app URL here. Leave empty to disable saving.
+    const SHEET_URL = "";
+
+    const LETTER = { secure: "A", anxious: "B", avoidant: "C", fearful: "D" };
+
+    async function getLocation() {
+      try {
+        const r = await fetch("https://ipapi.co/json/");
+        if (!r.ok) throw new Error();
+        const d = await r.json();
+        return [d.city, d.region, d.country_name].filter(Boolean).join(", ") || "Unknown";
+      } catch (e) {
+        return "Unknown";
+      }
+    }
+
+    async function saveResult(result, secondary, counts) {
+      if (!SHEET_URL) return;
+      const payload = {
+        location: await getLocation(),
+        result,
+        secondary,
+        counts,
+        answers: answers.map(a => `${LETTER[a]} (${a})`)
+      };
+      try {
+        await fetch(SHEET_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+      } catch (e) { /* saving is best-effort; never block the result */ }
+    }
+
     let current = 0;
     let answers = new Array(questions.length).fill(null);
 
@@ -645,6 +681,9 @@
         desc += `<br><br>You also show a notable secondary leaning toward <strong>${styleInfo[secondary].name}</strong> (${secondaryCount} answers). Many people have blended patterns rather than a pure type.`;
       }
       document.getElementById("description").innerHTML = desc;
+
+      const hasSecondary = secondaryCount >= primaryCount - 2 && secondaryCount >= 3;
+      saveResult(info.name, hasSecondary ? styleInfo[secondary].name : "", counts);
     }
 
     function restart() {
