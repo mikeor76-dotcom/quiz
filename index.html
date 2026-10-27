@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A 12-question self-reflection quiz exploring adult attachment patterns, inspired by Polysecure by Jessica Fern.">
+  <meta property="og:title" content="Attachment Style Quiz">
+  <meta property="og:description" content="A 12-question self-reflection quiz exploring adult attachment patterns, inspired by Polysecure by Jessica Fern.">
+  <meta property="og:type" content="website">
+  <title>Attachment Style Quiz (Polysecure-inspired)</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --card: #1a1d27;
+      --border: #2a2f3d;
+      --text: #e8eaf0;
+      --muted: #9aa3b5;
+      --accent: #7c5cff;
+      --accent-hover: #6a4de0;
+      --secure: #3ecf8e;
+      --anxious: #f0b429;
+      --avoidant: #5b9df9;
+      --fearful: #f07178;
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 24px 16px;
+      line-height: 1.5;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 640px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      letter-spacing: -0.02em;
+    }
+
+    header p {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .progress-wrap {
+      margin-bottom: 24px;
+    }
+
+    .progress-bar {
+      height: 6px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 99px;
+      transition: width 0.3s ease;
+      width: 0%;
+    }
+
+    .progress-text {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 8px;
+      text-align: right;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    }
+
+    .question-number {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 10px;
+    }
+
+    .question-text {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 22px;
+      line-height: 1.4;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 16px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .option:hover {
+      border-color: var(--accent);
+      background: rgba(124, 92, 255, 0.08);
+    }
+
+    .option.selected {
+      border-color: var(--accent);
+      background: rgba(124, 92, 255, 0.15);
+    }
+
+    .option input {
+      display: none;
+    }
+
+    .radio {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--muted);
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 2px;
+      position: relative;
+      transition: border-color 0.15s;
+    }
+
+    .option.selected .radio {
+      border-color: var(--accent);
+    }
+
+    .option.selected .radio::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 10px;
+      height: 10px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    .option-label {
+      font-size: 0.98rem;
+      color: var(--text);
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 28px;
+      gap: 12px;
+    }
+
+    button {
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 12px 22px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      color: var(--text);
+      border-color: var(--muted);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      flex: 1;
+      max-width: 200px;
+      margin-left: auto;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--accent-hover);
+    }
+
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* Results */
+    .results {
+      display: none;
+    }
+
+    .results.visible {
+      display: block;
+    }
+
+    .result-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .result-header h2 {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+
+    .style-badge {
+      display: inline-block;
+      padding: 8px 18px;
+      border-radius: 99px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-top: 8px;
+    }
+
+    .badge-secure { background: rgba(62, 207, 142, 0.2); color: var(--secure); }
+    .badge-anxious { background: rgba(240, 180, 41, 0.2); color: var(--anxious); }
+    .badge-avoidant { background: rgba(91, 157, 249, 0.2); color: var(--avoidant); }
+    .badge-fearful { background: rgba(240, 113, 120, 0.2); color: var(--fearful); }
+
+    .score-bars {
+      margin: 28px 0;
+    }
+
+    .score-row {
+      margin-bottom: 16px;
+    }
+
+    .score-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+    }
+
+    .score-label span:last-child {
+      color: var(--muted);
+    }
+
+    .bar-bg {
+      height: 10px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.6s ease;
+    }
+
+    .bar-secure { background: var(--secure); }
+    .bar-anxious { background: var(--anxious); }
+    .bar-avoidant { background: var(--avoidant); }
+    .bar-fearful { background: var(--fearful); }
+
+    .description {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .description strong {
+      color: var(--text);
+    }
+
+    .note {
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 20px;
+      line-height: 1.5;
+    }
+
+    .restart {
+      display: block;
+      width: 100%;
+      margin-top: 24px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .restart:hover {
+      color: var(--text);
+      border-color: var(--muted);
+    }
+
+    .intro {
+      text-align: center;
+    }
+
+    .intro p {
+      color: var(--muted);
+      margin-bottom: 20px;
+      font-size: 0.95rem;
+    }
+
+    .intro .btn-primary {
+      max-width: none;
+      width: 100%;
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 22px 18px; }
+      .question-text { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Attachment Style Quiz</h1>
+      <p>Inspired by the framework in <em>Polysecure</em> by Jessica Fern</p>
+    </header>
+
+    <!-- Intro -->
+    <div class="card intro" id="intro">
+      <p>This 12-question quiz helps you explore your predominant adult attachment pattern using the two dimensions of anxiety and avoidance discussed in <em>Polysecure</em>.</p>
+      <p>Answer based on how you <strong>generally</strong> feel and behave in close relationships. There are no right or wrong answers.</p>
+      <button class="btn-primary" onclick="startQuiz()">Begin Quiz</button>
+    </div>
+
+    <!-- Quiz -->
+    <div id="quiz" style="display:none;">
+      <div class="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="progress-text" id="progressText">Question 1 of 12</div>
+      </div>
+
+      <div class="card">
+        <div class="question-number" id="qNum">Question 1</div>
+        <div class="question-text" id="qText"></div>
+        <div class="options" id="options"></div>
+        <div class="nav">
+          <button class="btn-secondary" id="prevBtn" onclick="prevQuestion()" disabled>Back</button>
+          <button class="btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>Next</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="card results" id="results">
+      <div class="result-header">
+        <h2>Your Result</h2>
+        <div class="style-badge" id="styleBadge"></div>
+      </div>
+
+      <div class="score-bars" id="scoreBars"></div>
+
+      <div class="description" id="description"></div>
+
+      <p class="note">
+        This is an educational self-reflection tool, not a clinical diagnosis. Attachment patterns can shift over time and often vary by relationship. The goal is greater self-understanding, not a fixed label.
+      </p>
+
+      <button class="restart" onclick="restart()">Retake Quiz</button>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        text: "When I feel close to someone, I usually:",
+        options: [
+          { letter: "A", text: "Feel comfortable and open", style: "secure" },
+          { letter: "B", text: "Worry they may not feel as close to me as I do to them", style: "anxious" },
+          { letter: "C", text: "Feel the need to keep some emotional distance or independence", style: "avoidant" },
+          { letter: "D", text: "Feel both drawn toward them and afraid of getting too close", style: "fearful" }
+        ]
+      },
+      {
+        text: "If a partner doesn’t respond to a message for longer than expected, I tend to:",
+        options: [
+          { letter: "A", text: "Assume they’re busy and wait without much distress", style: "secure" },
+          { letter: "B", text: "Feel anxious, ruminate, or worry I’ve done something wrong", style: "anxious" },
+          { letter: "C", text: "Feel annoyed or withdraw emotionally", style: "avoidant" },
+          { letter: "D", text: "Swing between anxiety/worry and wanting to pull away or shut down", style: "fearful" }
+        ]
+      },
+      {
+        text: "When I’m upset or stressed, I usually:",
+        options: [
+          { letter: "A", text: "Can talk about it with a partner when I need support and also soothe myself", style: "secure" },
+          { letter: "B", text: "Seek a lot of reassurance or feel overwhelmed until I get it", style: "anxious" },
+          { letter: "C", text: "Prefer to handle it alone and may shut down or distract myself", style: "avoidant" },
+          { letter: "D", text: "Struggle to know what I need and may push people away even while wanting comfort", style: "fearful" }
+        ]
+      },
+      {
+        text: "In arguments or conflict, I tend to:",
+        options: [
+          { letter: "A", text: "Stay present, express myself, and work toward repair", style: "secure" },
+          { letter: "B", text: "Get highly activated, pursue the other person, or fear the relationship is in danger", style: "anxious" },
+          { letter: "C", text: "Withdraw, shut down, or want space right away", style: "avoidant" },
+          { letter: "D", text: "Feel flooded and may both pursue and withdraw in confusing ways", style: "fearful" }
+        ]
+      },
+      {
+        text: "My view of depending on a partner is closest to:",
+        options: [
+          { letter: "A", text: "It’s okay and natural to depend on each other in healthy ways", style: "secure" },
+          { letter: "B", text: "I often need a lot of closeness and reassurance to feel secure", style: "anxious" },
+          { letter: "C", text: "I prefer to rely mainly on myself; too much dependence feels uncomfortable", style: "avoidant" },
+          { letter: "D", text: "I want closeness but also fear being hurt or trapped by depending on someone", style: "fearful" }
+        ]
+      },
+      {
+        text: "When a partner wants more space or time alone than usual, I typically:",
+        options: [
+          { letter: "A", text: "Respect it and don’t take it personally", style: "secure" },
+          { letter: "B", text: "Feel rejected or anxious and may try to close the gap", style: "anxious" },
+          { letter: "C", text: "Feel relieved or also want space", style: "avoidant" },
+          { letter: "D", text: "Feel both abandoned and a desire to pull further away myself", style: "fearful" }
+        ]
+      },
+      {
+        text: "Expressing my deeper needs, fears, or vulnerabilities feels:",
+        options: [
+          { letter: "A", text: "Generally safe and doable with people I trust", style: "secure" },
+          { letter: "B", text: "Important, but I often worry about how the other person will respond", style: "anxious" },
+          { letter: "C", text: "Uncomfortable or unnecessary; I prefer to keep things more self-contained", style: "avoidant" },
+          { letter: "D", text: "Risky — I both want to share and fear it will backfire or leave me exposed", style: "fearful" }
+        ]
+      },
+      {
+        text: "In relationships, I most often:",
+        options: [
+          { letter: "A", text: "Feel basically secure that the other person cares even when we’re not in constant contact", style: "secure" },
+          { letter: "B", text: "Monitor the relationship closely and notice small changes in availability or affection", style: "anxious" },
+          { letter: "C", text: "Value my independence highly and can feel crowded by too much emotional intensity", style: "avoidant" },
+          { letter: "D", text: "Experience a push-pull: craving connection while also protecting myself from getting hurt", style: "fearful" }
+        ]
+      },
+      {
+        text: "After a disagreement is resolved (or temporarily paused), I usually:",
+        options: [
+          { letter: "A", text: "Can reconnect and move forward relatively easily", style: "secure" },
+          { letter: "B", text: "Need extra reassurance that we’re still okay", style: "anxious" },
+          { letter: "C", text: "Prefer some time alone to reset before fully re-engaging", style: "avoidant" },
+          { letter: "D", text: "Feel residual confusion, hypervigilance, or mixed signals inside myself", style: "fearful" }
+        ]
+      },
+      {
+        text: "My overall pattern in close relationships tends to be:",
+        options: [
+          { letter: "A", text: "Relatively steady, with room for both closeness and autonomy", style: "secure" },
+          { letter: "B", text: "Intense, emotionally charged, and sensitive to signs of distance", style: "anxious" },
+          { letter: "C", text: "More self-reliant, with a preference for keeping emotional intensity moderate", style: "avoidant" },
+          { letter: "D", text: "Unpredictable or mixed — sometimes very close, sometimes distant or guarded", style: "fearful" }
+        ]
+      },
+      {
+        text: "When I think about a partner having other close or romantic connections (relevant if you’re exploring non-monogamy, or just hypothetically):",
+        options: [
+          { letter: "A", text: "I can generally feel secure if we have good agreements and communication", style: "secure" },
+          { letter: "B", text: "I often feel threatened, jealous, or need a lot of reassurance", style: "anxious" },
+          { letter: "C", text: "I may feel relieved or prefer the extra independence it can bring", style: "avoidant" },
+          { letter: "D", text: "I feel both drawn to the freedom and highly activated/fearful about loss or comparison", style: "fearful" }
+        ]
+      },
+      {
+        text: "Looking at my history, the description that fits best is:",
+        options: [
+          { letter: "A", text: "I’ve mostly been able to form trusting, interdependent bonds", style: "secure" },
+          { letter: "B", text: "I’ve often worried about being left, not being enough, or needing more closeness than partners could give", style: "anxious" },
+          { letter: "C", text: "I’ve often prioritized self-reliance and found too much emotional dependence uncomfortable", style: "avoidant" },
+          { letter: "D", text: "I’ve experienced strong longing for connection paired with fear of getting hurt or losing myself", style: "fearful" }
+        ]
+      }
+    ];
+
+    const styleInfo = {
+      secure: {
+        name: "Secure",
+        badgeClass: "badge-secure",
+        description: "Your answers most strongly reflect a <strong>Secure</strong> attachment pattern. You tend to be comfortable with both closeness and independence. You can seek support when needed and also give partners space without excessive fear of abandonment or engulfment. In the language of <em>Polysecure</em>, this is the foundation for becoming a reliable safe haven and secure base for others (and yourself)."
+      },
+      anxious: {
+        name: "Anxious / Preoccupied",
+        badgeClass: "badge-anxious",
+        description: "Your answers most strongly reflect an <strong>Anxious (Preoccupied)</strong> attachment pattern. You likely value closeness highly and can be sensitive to signs of distance or inconsistency. You may seek frequent reassurance and feel activated when connection feels uncertain. This style carries a strong drive for connection — the work is often about building internal security and tolerating normal fluctuations in availability."
+      },
+      avoidant: {
+        name: "Dismissive / Avoidant",
+        badgeClass: "badge-avoidant",
+        description: "Your answers most strongly reflect a <strong>Dismissive-Avoidant</strong> attachment pattern. You tend to prioritize independence and self-reliance, and may feel uncomfortable with high levels of emotional dependence or intensity. You can appear calm and self-sufficient. The growth edge is often learning to stay present with vulnerability (yours and others’) and allowing more interdependence without losing your sense of autonomy."
+      },
+      fearful: {
+        name: "Fearful-Avoidant",
+        badgeClass: "badge-fearful",
+        description: "Your answers most strongly reflect a <strong>Fearful-Avoidant</strong> (sometimes called disorganized) attachment pattern. You may experience a push-pull: a strong desire for closeness paired with fear of getting hurt or losing yourself. Relationships can feel both compelling and threatening. This style often benefits from building safety slowly, increasing tolerance for both connection and autonomy, and working with the underlying fear of vulnerability."
+      }
+    };
+
+    let current = 0;
+    let answers = new Array(questions.length).fill(null);
+
+    function startQuiz() {
+      document.getElementById("intro").style.display = "none";
+      document.getElementById("quiz").style.display = "block";
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const q = questions[current];
+      document.getElementById("qNum").textContent = `Question ${current + 1}`;
+      document.getElementById("qText").textContent = q.text;
+
+      const opts = document.getElementById("options");
+      opts.innerHTML = "";
+
+      q.options.forEach((opt, i) => {
+        const div = document.createElement("div");
+        div.className = "option" + (answers[current] === opt.style ? " selected" : "");
+        div.onclick = () => selectOption(opt.style);
+        div.innerHTML = `
+          <div class="radio"></div>
+          <div class="option-label"><strong>${opt.letter}.</strong> ${opt.text}</div>
+        `;
+        opts.appendChild(div);
+      });
+
+      // Progress
+      const pct = ((current) / questions.length) * 100;
+      document.getElementById("progress").style.width = pct + "%";
+      document.getElementById("progressText").textContent = `Question ${current + 1} of ${questions.length}`;
+
+      // Buttons
+      document.getElementById("prevBtn").disabled = current === 0;
+      const nextBtn = document.getElementById("nextBtn");
+      nextBtn.disabled = answers[current] === null;
+      nextBtn.textContent = current === questions.length - 1 ? "See Results" : "Next";
+    }
+
+    function selectOption(style) {
+      answers[current] = style;
+      renderQuestion();
+    }
+
+    function nextQuestion() {
+      if (answers[current] === null) return;
+      if (current < questions.length - 1) {
+        current++;
+        renderQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function prevQuestion() {
+      if (current > 0) {
+        current--;
+        renderQuestion();
+      }
+    }
+
+    function showResults() {
+      document.getElementById("quiz").style.display = "none";
+      const resultsEl = document.getElementById("results");
+      resultsEl.classList.add("visible");
+
+      // Tally
+      const counts = { secure: 0, anxious: 0, avoidant: 0, fearful: 0 };
+      answers.forEach(a => counts[a]++);
+
+      // Find primary (and secondary if close)
+      const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+      const primary = sorted[0][0];
+      const primaryCount = sorted[0][1];
+      const secondary = sorted[1][0];
+      const secondaryCount = sorted[1][1];
+
+      // Badge
+      const info = styleInfo[primary];
+      const badge = document.getElementById("styleBadge");
+      badge.textContent = info.name;
+      badge.className = "style-badge " + info.badgeClass;
+
+      // Bars
+      const max = 12;
+      const bars = document.getElementById("scoreBars");
+      bars.innerHTML = `
+        <div class="score-row">
+          <div class="score-label"><span>Secure</span><span>${counts.secure}/12</span></div>
+          <div class="bar-bg"><div class="bar-fill bar-secure" style="width:${(counts.secure/max)*100}%"></div></div>
+        </div>
+        <div class="score-row">
+          <div class="score-label"><span>Anxious / Preoccupied</span><span>${counts.anxious}/12</span></div>
+          <div class="bar-bg"><div class="bar-fill bar-anxious" style="width:${(counts.anxious/max)*100}%"></div></div>
+        </div>
+        <div class="score-row">
+          <div class="score-label"><span>Dismissive / Avoidant</span><span>${counts.avoidant}/12</span></div>
+          <div class="bar-bg"><div class="bar-fill bar-avoidant" style="width:${(counts.avoidant/max)*100}%"></div></div>
+        </div>
+        <div class="score-row">
+          <div class="score-label"><span>Fearful-Avoidant</span><span>${counts.fearful}/12</span></div>
+          <div class="bar-bg"><div class="bar-fill bar-fearful" style="width:${(counts.fearful/max)*100}%"></div></div>
+        </div>
+      `;
+
+      // Description
+      let desc = info.description;
+      if (secondaryCount >= primaryCount - 2 && secondaryCount >= 3) {
+        desc += `<br><br>You also show a notable secondary leaning toward <strong>${styleInfo[secondary].name}</strong> (${secondaryCount} answers). Many people have blended patterns rather than a pure type.`;
+      }
+      document.getElementById("description").innerHTML = desc;
+    }
+
+    function restart() {
+      current = 0;
+      answers = new Array(questions.length).fill(null);
+      document.getElementById("results").classList.remove("visible");
+      document.getElementById("intro").style.display = "block";
+      document.getElementById("quiz").style.display = "none";
+      document.getElementById("progress").style.width = "0%";
+    }
+  </script>
+</body>
+</html>
